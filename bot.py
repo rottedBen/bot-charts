@@ -100,7 +100,7 @@ def add_favorite_token(update: Update, context: CallbackContext):
     favorite_path = charts_path + username + '.txt'
 
     if not os.path.isfile(favorite_path):
-        f = open("myfile.txt", "x")
+        f = open(favorite_path, "x")
         f.close()
 
     with open(favorite_path) as f:
