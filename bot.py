@@ -84,12 +84,48 @@ def check_query(query_received):
     return time_type, k_hours, k_days, tokens
 
 
+def check_query_fav(query_received):
+    time_type, k_hours, k_days = 'd', 1, 0, 1
+    if len(query_received) == 1:
+        pass
+    elif len(query_received) == 2:
+        pass
+    else:
+        time_type, k_hours, k_days = get_from_query(query_received)
+    return time_type, k_hours, k_days
+
+
+
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
 
     query_received = update.message.text.split(' ')
 
     time_type, k_hours, k_days, tokens = check_query(query_received)
+    t_to = int(time.time())
+    t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
+
+    for token in tokens:
+        print("requesting coin " + token + " from " + str(k_days) + " days and " + str(k_hours) + " hours")
+        path = charts_path + token + '.png'
+        last_price = graphs_util.print_candlestick(token, t_from, t_to, path)
+        message = "<code>" + token + " $" + str(last_price) + "</code>"
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(path, 'rb'),
+                               caption=message,
+                               parse_mode="html")
+
+
+def see_fav_charts(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+
+    query_received = update.message.text.split(' ')
+
+    time_type, k_hours, k_days = check_query_fav(query_received)
+    username = update.message.from_user.username
+    favorite_path = charts_path + username + '.txt'
+    create_file_if_not_existing(favorite_path)
+    tokens = read_favorites(favorite_path)
     t_to = int(time.time())
     t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
 
@@ -178,6 +214,7 @@ def main():
     dp.add_handler(CommandHandler('add_fav', add_favorite_token))
     dp.add_handler(CommandHandler('see_fav', see_fav_token))
     dp.add_handler(CommandHandler('remove_fav', delete_fav_token))
+    dp.add_handler(CommandHandler('charts_fav', see_fav_charts))
     updater.start_polling()
     updater.idle()
 
@@ -187,6 +224,7 @@ if __name__ == '__main__':
 
 commands = """
 charts - Display some charts.
+charts_fav - Display your favorite charts
 add_fav - Add a favorite token.
 see_fav - See your favorites tokens.
 remove_fav - Remove a token from your favorites.
