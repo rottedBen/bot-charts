@@ -92,10 +92,10 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
         path = charts_path + token + '.png'
         last_price = graphs_util.print_candlestick(token, t_from, t_to, path)
         message = "<code>" + token + " $" + str(last_price) + "</code>"
-        context.bot.send_photo(chat_id=chat_id,
-                               photo=open(path, 'rb'),
-                               caption=message,
-                               parse_mode="html")
+        # context.bot.send_photo(chat_id=chat_id,
+        #                        photo=open(path, 'rb'),
+        #                        caption=message,
+        #                        parse_mode="html")
 
 
 def main():
