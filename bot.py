@@ -22,7 +22,7 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 
 def read_favorites(path):
     with open(path) as f:
-        msgs = f.readlines()
+        msgs = [line.rstrip() for line in f]
     return msgs
 
 
@@ -30,6 +30,7 @@ def create_file_if_not_existing(path):
     if not os.path.isfile(path):
         f = open(path, "x")
         f.close()
+
 
 # convert int to nice string: 1234567 => 1 234 567
 def number_to_beautiful(nbr):
