@@ -87,15 +87,17 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
     t_to = int(time.time())
     t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
 
+    pprint.pprint(tokens)
+
     for token in tokens:
         print("requesting coin " + token + " from " + str(k_days) + " days and " + str(k_hours) + " hours")
         path = charts_path + token + '.png'
         last_price = graphs_util.print_candlestick(token, t_from, t_to, path)
         message = "<code>" + token + " $" + str(last_price) + "</code>"
-        # context.bot.send_photo(chat_id=chat_id,
-        #                        photo=open(path, 'rb'),
-        #                        caption=message,
-        #                        parse_mode="html")
+        context.bot.send_photo(chat_id=chat_id,
+                               photo=open(path, 'rb'),
+                               caption=message,
+                               parse_mode="html")
 
 
 def main():
