@@ -2,6 +2,7 @@ import locale
 import os
 import time
 from datetime import datetime
+import pprint
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
@@ -55,10 +56,9 @@ def keep_dates(values_list):
 
 
 def check_query(query_received):
-    simple_query = False
     time_type, time_start, k_hours, k_days, tokens = 'd', 1, 0, 1, "ROT"
     if len(query_received) == 1:
-        simple_query = True
+        pass
     elif len(query_received) == 2:
         tokens = [query_received[1]]
     elif len(query_received) == 3:
@@ -68,8 +68,10 @@ def check_query(query_received):
         tokens = [query_received[-1]]
     else:
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
+        print("query received:")
+        pprint.pprint(query_received)
         tokens = query_received[3: -1]
-    return time_type, time_start, k_hours, k_days, simple_query, tokens
+    return time_type, k_hours, k_days, tokens
 
 
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
@@ -81,7 +83,7 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
         print("hello me")
         last_time_checked_price_candles = 1
 
-    time_type, time_start, k_hours, k_days, simple_query, tokens = check_query(query_received)
+    time_type, k_hours, k_days, tokens = check_query(query_received)
     t_to = int(time.time())
     t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
 
