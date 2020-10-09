@@ -56,16 +56,16 @@ def keep_dates(values_list):
 
 def check_query(query_received):
     simple_query = False
-    time_type, time_start, k_hours, k_days, tokens = 'd', 1, 0, 1, "NICE"
+    time_type, time_start, k_hours, k_days, tokens = 'd', 1, 0, 1, "ROT"
     if len(query_received) == 1:
         simple_query = True
     elif len(query_received) == 2:
-        tokens = list(query_received[1])
+        tokens = [query_received[1]]
     elif len(query_received) == 3:
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
     elif len(query_received) == 4:
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
-        tokens = list(query_received[-1])
+        tokens = [query_received[-1]]
     else:
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
         tokens = query_received[3: -1]
@@ -86,7 +86,7 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
     t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
 
     for token in tokens:
-        print("requesting coin " + token + "from " + str(k_days) + " days and " + str(k_hours) + " hours")
+        print("requesting coin " + token + " from " + str(k_days) + " days and " + str(k_hours) + " hours")
         path = charts_path + token
         last_price = graphs_util.print_candlestick(token, t_from, t_to, path)
         message = "<code>" + token + " $" + str(last_price) + "</code>"
