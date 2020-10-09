@@ -110,7 +110,7 @@ def see_fav_token(update: Update, context: CallbackContext):
     favorite_path = charts_path + username + '.txt'
     create_file_if_not_existing(favorite_path)
     msgs = read_favorites(favorite_path)
-    context.bot.send_message(chat_id=chat_id, text=' '.join(msgs))
+    context.bot.send_message(chat_id=chat_id, text=', '.join(msgs))
 
 
 def add_favorite_token(update: Update, context: CallbackContext):
@@ -132,6 +132,28 @@ def add_favorite_token(update: Update, context: CallbackContext):
                 message_to_write = symbol_to_add + "\n"
                 fav_file.write(message_to_write)
             context.bot.send_message(chat_id=chat_id, text="Added " + symbol_to_add + " to your favorites.")
+
+
+def add_favorite_token(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    username = update.message.from_user.username
+    favorite_path = charts_path + username + '.txt'
+    create_file_if_not_existing(favorite_path)
+    msgs = read_favorites(favorite_path)
+    query_received = update.message.text.split(' ')
+
+    if not len(query_received) == 2:
+        context.bot.send_message(chat_id=chat_id, text="Error. Can only add one symbol at a time")
+    else:
+        symbol_to_add = query_received[1]
+        if symbol_to_add in msgs:
+            context.bot.send_message(chat_id=chat_id, text="Error. Looks like the symbol " + symbol_to_add + " is already in your favorites.")
+        else:
+            with open(favorite_path, "a") as fav_file:
+                message_to_write = symbol_to_add + "\n"
+                fav_file.write(message_to_write)
+            context.bot.send_message(chat_id=chat_id, text="Added " + symbol_to_add + " to your favorites.")
+
 
 
 def main():
