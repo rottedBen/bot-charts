@@ -68,7 +68,7 @@ def delete_line_from_file(path, msg):
 
 
 def check_query(query_received):
-    time_type, k_hours, k_days, tokens = 'd', 1, 0, 1, "ROT"
+    time_type, k_hours, k_days, tokens = 'd', 0, 1, "ROT"
     if len(query_received) == 1:
         pass
     elif len(query_received) == 2:
