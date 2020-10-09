@@ -17,7 +17,8 @@ charts_path = BASE_PATH + 'chart_bot/log_files/'
 
 locale.setlocale(locale.LC_ALL, 'en_US')
 
-# convert int to nice string: 1234567 => 1.234.567
+
+# convert int to nice string: 1234567 => 1 234 567
 def number_to_beautiful(nbr):
     return locale.format_string("%d", nbr, grouping=True).replace(",", " ")
 
@@ -81,11 +82,11 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
         last_time_checked_price_candles = 1
 
     time_type, time_start, k_hours, k_days, simple_query, tokens = check_query(query_received)
-
     t_to = int(time.time())
     t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
 
     for token in tokens:
+        print("requesting coin " + token + "from " + str(k_days) + " days and " + str(k_hours) + " hours")
         path = charts_path + token
         last_price = graphs_util.print_candlestick(token, t_from, t_to, path)
         message = "<code>" + token + " $" + str(last_price) + "</code>"
@@ -93,6 +94,7 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
                                photo=open(path, 'rb'),
                                caption=message,
                                parse_mode="html")
+
 
 def main():
     updater = Updater(TELEGRAM_KEY, use_context=True)
