@@ -20,6 +20,17 @@ charts_path = BASE_PATH + 'chart_bot/log_files/'
 locale.setlocale(locale.LC_ALL, 'en_US')
 
 
+def read_favorites(path):
+    with open(path) as f:
+        msgs = f.readline()
+    return msgs
+
+
+def create_file_if_not_existing(path):
+    if not os.path.isfile(path):
+        f = open(path, "x")
+        f.close()
+
 # convert int to nice string: 1234567 => 1 234 567
 def number_to_beautiful(nbr):
     return locale.format_string("%d", nbr, grouping=True).replace(",", " ")
@@ -93,19 +104,21 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
                                parse_mode="html")
 
 
+def see_fav_token(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    username = update.message.from_user.username
+    favorite_path = charts_path + username + '.txt'
+    create_file_if_not_existing(favorite_path)
+    msgs = read_favorites(favorite_path)
+    context.bot.send_message(chat_id=chat_id, text=' '.join(msgs))
+
+
 def add_favorite_token(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     username = update.message.from_user.username
-
     favorite_path = charts_path + username + '.txt'
-
-    if not os.path.isfile(favorite_path):
-        f = open(favorite_path, "x")
-        f.close()
-
-    with open(favorite_path) as f:
-        msgs = f.readline()
-
+    create_file_if_not_existing(favorite_path)
+    msgs = read_favorites(favorite_path)
     query_received = update.message.text.split(' ')
 
     if not len(query_received) == 2:
@@ -118,7 +131,7 @@ def add_favorite_token(update: Update, context: CallbackContext):
             with open(favorite_path, "a") as fav_file:
                 message_to_write = symbol_to_add + "\n"
                 fav_file.write(message_to_write)
-            context.bot.send_message(chat_id=chat_id, text="Added" + symbol_to_add + " to your favorites.")
+            context.bot.send_message(chat_id=chat_id, text="Added " + symbol_to_add + " to your favorites.")
 
 
 def main():
@@ -126,6 +139,8 @@ def main():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('charts', get_candlestick_pyplot))
     dp.add_handler(CommandHandler('add_fav', add_favorite_token))
+    dp.add_handler(CommandHandler('see_fav', see_fav_token))
+    dp.add_handler(CommandHandler('remove_fav', add_favorite_token))
     updater.start_polling()
     updater.idle()
 
@@ -134,6 +149,8 @@ if __name__ == '__main__':
     main()
 
 commands = """
-charts - Display some charts
-add_fav - Add a favorite token
+charts - Display some charts.
+add_fav - Add a favorite token.
+see_fav - See your favorites tokens.
+remove_fav - Remove a token from your favorites.
 """
