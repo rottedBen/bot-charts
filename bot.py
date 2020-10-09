@@ -22,7 +22,7 @@ locale.setlocale(locale.LC_ALL, 'en_US')
 
 def read_favorites(path):
     with open(path) as f:
-        msgs = f.readline()
+        msgs = f.readlines()
     return msgs
 
 
