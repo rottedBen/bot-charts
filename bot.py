@@ -70,7 +70,7 @@ def check_query(query_received):
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
         print("query received:")
         pprint.pprint(query_received)
-        tokens = query_received[3: -1]
+        tokens = query_received[3:]
     return time_type, k_hours, k_days, tokens
 
 
