@@ -109,16 +109,16 @@ def add_favorite_token(update: Update, context: CallbackContext):
     query_received = update.message.text.split(' ')
 
     if not len(query_received) == 2:
-        context.bot.send_message(chat_id=chat_id, caption="Error. Can only add one symbol at a time")
+        context.bot.send_message(chat_id=chat_id, text="Error. Can only add one symbol at a time")
     else:
         symbol_to_add = query_received[1]
         if symbol_to_add in msgs:
-            context.bot.send_message(chat_id=chat_id, caption="Error. Looks like the symbol " + symbol_to_add + " is already in your favorites.")
+            context.bot.send_message(chat_id=chat_id, text="Error. Looks like the symbol " + symbol_to_add + " is already in your favorites.")
         else:
             with open(favorite_path, "a") as fav_file:
                 message_to_write = symbol_to_add + "\n"
                 fav_file.write(message_to_write)
-            context.bot.send_message(chat_id=chat_id, caption="Added" + symbol_to_add + " to your favorites.")
+            context.bot.send_message(chat_id=chat_id, text="Added" + symbol_to_add + " to your favorites.")
 
 
 def main():
