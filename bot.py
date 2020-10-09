@@ -3,6 +3,7 @@ import os
 import time
 from datetime import datetime
 import pprint
+import os.path
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
@@ -68,26 +69,18 @@ def check_query(query_received):
         tokens = [query_received[-1]]
     else:
         time_type, time_start, k_hours, k_days = get_from_query(query_received)
-        print("query received:")
-        pprint.pprint(query_received)
         tokens = query_received[3:]
     return time_type, k_hours, k_days, tokens
 
 
 def get_candlestick_pyplot(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    global last_time_checked_price_candles
 
     query_received = update.message.text.split(' ')
-    if update.message.from_user.first_name == 'Ben':
-        print("hello me")
-        last_time_checked_price_candles = 1
 
     time_type, k_hours, k_days, tokens = check_query(query_received)
     t_to = int(time.time())
     t_from = t_to - (k_days * 3600 * 24) - (k_hours * 3600)
-
-    pprint.pprint(tokens)
 
     for token in tokens:
         print("requesting coin " + token + " from " + str(k_days) + " days and " + str(k_hours) + " hours")
@@ -100,10 +93,39 @@ def get_candlestick_pyplot(update: Update, context: CallbackContext):
                                parse_mode="html")
 
 
+def add_favorite_token(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    username = update.message.from_user.username
+
+    favorite_path = charts_path + username + '.txt'
+
+    if not os.path.isfile(favorite_path):
+        f = open("myfile.txt", "x")
+        f.close()
+
+    with open(favorite_path) as f:
+        msgs = f.readline()
+
+    query_received = update.message.text.split(' ')
+
+    if not len(query_received) == 2:
+        context.bot.send_message(chat_id=chat_id, caption="Error. Can only add one symbol at a time")
+    else:
+        symbol_to_add = query_received[1]
+        if symbol_to_add in msgs:
+            context.bot.send_message(chat_id=chat_id, caption="Error. Looks like the symbol " + symbol_to_add + " is already in your favorites.")
+        else:
+            with open(favorite_path, "a") as fav_file:
+                message_to_write = symbol_to_add + "\n"
+                fav_file.write(message_to_write)
+            context.bot.send_message(chat_id=chat_id, caption="Added" + symbol_to_add + " to your favorites.")
+
+
 def main():
     updater = Updater(TELEGRAM_KEY, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(CommandHandler('charts', get_candlestick_pyplot))
+    dp.add_handler(CommandHandler('add_fav', add_favorite_token))
     updater.start_polling()
     updater.idle()
 
@@ -113,4 +135,5 @@ if __name__ == '__main__':
 
 commands = """
 charts - Display some charts
+add_fav - Add a favorite token
 """
