@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 import pprint
 import os.path
+import re
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
@@ -39,7 +40,12 @@ def number_to_beautiful(nbr):
 
 def get_from_query(query_received):
     time_type = query_received[2]
-    time_start = int(query_received[1])
+    try:
+        time_start = int(query_received[1])
+    except ValueError:
+        time_start = int(re.search(r'\d+', query_received[1]).group())
+        time_type = query_received[1][-1]
+
     if time_start < 0:
         time_start = - time_start
     k_hours = 0
